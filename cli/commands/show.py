@@ -140,7 +140,8 @@ def show_links(thread_id: int) -> None:
 
     init_db()
     repo = Repository()
-    links = repo.get_links_by_thread(thread_id)
+    # Use outerjoin query so pivot status is available without lazy-loading
+    rows = repo.get_pivot_results_by_thread(thread_id)
 
     if _is_tty():
         table = Table(title=f"Links — Thread #{thread_id}", show_lines=False)
@@ -151,18 +152,14 @@ def show_links(thread_id: int) -> None:
         table.add_column("Confidence", style="green")
         table.add_column("Status", style="dim")
 
-        for lk in links:
-            # Get pivot status if any
-            pivot_status = ""
-            if lk.pivot_results:
-                pivot_status = lk.pivot_results[-1].status
+        for lk, pr in rows:
             table.add_row(
                 str(lk.id),
                 str(lk.post_id),
                 lk.platform,
                 lk.handle or "",
                 f"{lk.confidence:.2f}",
-                pivot_status,
+                pr.status if pr else "pending",
             )
         console.print(table)
     else:
@@ -174,8 +171,9 @@ def show_links(thread_id: int) -> None:
                 "handle": lk.handle,
                 "raw_url": lk.raw_url,
                 "confidence": lk.confidence,
+                "pivot_status": pr.status if pr else "pending",
             }
-            for lk in links
+            for lk, pr in rows
         ]
         print(json.dumps(data, default=str))
 
