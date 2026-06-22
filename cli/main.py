@@ -19,6 +19,7 @@ from cli.commands.watch import watch
 from cli.commands.archive import archive
 from cli.commands.profile import profile
 from cli.commands.correlate import correlate
+from cli.commands.serve import serve
 
 cli.add_command(scrape)
 cli.add_command(show)
@@ -28,3 +29,4 @@ cli.add_command(watch)
 cli.add_command(archive)
 cli.add_command(profile)
 cli.add_command(correlate)
+cli.add_command(serve)
