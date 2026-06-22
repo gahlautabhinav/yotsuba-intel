@@ -83,7 +83,7 @@ REDDIT_RE = re.compile(r'reddit\.com/(?:u|user)/([\w\-]{3,20})', re.I)
 YOUTUBE_RE = re.compile(r'youtube\.com/(?:@|c/|user/)([\w\-]{3,50})', re.I)
 DISCORD_RE = re.compile(r'discord\.gg/([\w]{2,20})', re.I)
 KEYBASE_RE = re.compile(r'keybase\.io/([\w]{2,16})', re.I)
-PASTEBIN_RE = re.compile(r'pastebin\.com/(?:(u)/)?([\w]{2,})', re.I)
+PASTEBIN_RE = re.compile(r'pastebin\.com/(?:u/([\w]+)|([a-zA-Z0-9]{8}))', re.I)
 STEAM_RE = re.compile(r'steamcommunity\.com/(?:id|profiles)/([\w\-]{2,32})', re.I)
 GENERIC_RE = re.compile(r'https?://[\w\-\./\?=&%#@+:~]+', re.I)
 
@@ -191,9 +191,10 @@ def _match_keybase(text: str) -> list[tuple[str, str, float]]:
 def _match_pastebin(text: str) -> list[tuple[str, str, float]]:
     results = []
     for m in PASTEBIN_RE.finditer(text):
-        is_user = m.group(1) == "u"
-        handle = m.group(2).lower()
-        conf = 0.85 if is_user else 0.60
+        user_handle = m.group(1)   # set if /u/handle form
+        paste_key = m.group(2)     # set if 8-char paste key form
+        handle = (user_handle or paste_key).lower()
+        conf = 0.85 if user_handle else 0.60
         results.append((handle, m.group(0), conf))
     return results
 
