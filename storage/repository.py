@@ -220,6 +220,35 @@ class Repository:
             session.refresh(obj)
             return obj
 
+    def get_emails_by_thread(self, thread_id: int) -> list[models.Email]:
+        with get_session() as session:
+            return (
+                session.query(models.Email)
+                .join(models.Post, models.Email.post_id == models.Post.id)
+                .filter(models.Post.thread_id == thread_id)
+                .all()
+            )
+
+    def get_pgp_keys_by_thread(self, thread_id: int) -> list[models.PgpKey]:
+        with get_session() as session:
+            return (
+                session.query(models.PgpKey)
+                .join(models.Post, models.PgpKey.post_id == models.Post.id)
+                .filter(models.Post.thread_id == thread_id)
+                .all()
+            )
+
+    def get_pivot_results_by_thread(self, thread_id: int) -> list[tuple[models.SocialLink, Optional[models.PivotResult]]]:
+        with get_session() as session:
+            rows = (
+                session.query(models.SocialLink, models.PivotResult)
+                .join(models.Post, models.SocialLink.post_id == models.Post.id)
+                .outerjoin(models.PivotResult, models.PivotResult.link_id == models.SocialLink.id)
+                .filter(models.Post.thread_id == thread_id)
+                .all()
+            )
+            return rows
+
     def get_pending_emails(self) -> list[models.Email]:
         with get_session() as session:
             return session.query(models.Email).filter_by(pivoted_at=None).all()
