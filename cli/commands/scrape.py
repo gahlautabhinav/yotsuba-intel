@@ -57,6 +57,7 @@ def scrape(url: str, download_images: bool) -> None:
     new_links = 0
     new_emails = 0
     new_pgp = 0
+    post_pairs: list[tuple[int, dict]] = []  # (post_db_id, PostData) for image downloader
 
     for pd in posts_data:
         post = repo.save_post(
@@ -80,6 +81,7 @@ def scrape(url: str, download_images: bool) -> None:
             img_w=pd["file"]["w"] if pd["has_file"] and pd.get("file") else None,
             img_h=pd["file"]["h"] if pd["has_file"] and pd.get("file") else None,
         )
+        post_pairs.append((post.id, pd))
         new_posts += 1
 
         # Upsert tripcode if present
@@ -125,7 +127,17 @@ def scrape(url: str, download_images: bool) -> None:
             new_pgp += 1
 
     if download_images:
-        console.print("[yellow]--download-images: image downloading not yet implemented (Phase 5)[/yellow]")
+        from scraper.image_downloader import download_thread_images
+        dl_counts = download_thread_images(
+            board=board,
+            post_pairs=post_pairs,
+            repo=repo,
+        )
+        console.print(
+            f"Images: {dl_counts['downloaded']} downloaded, "
+            f"{dl_counts['skipped']} skipped, "
+            f"{dl_counts['failed']} failed"
+        )
 
     # 6. Summary output
     console.print(
