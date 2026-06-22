@@ -4,6 +4,7 @@ import json
 from datetime import datetime, timezone
 from typing import Optional
 
+from sqlalchemy import select
 from storage.engine import get_session
 from storage import models
 
@@ -135,9 +136,9 @@ class Repository:
 
     def get_pending_links(self, platform: Optional[str] = None) -> list[models.SocialLink]:
         with get_session() as session:
-            pivoted_ids = session.query(models.PivotResult.link_id).filter(
+            pivoted_ids = select(models.PivotResult.link_id).where(
                 models.PivotResult.status.in_(["success", "failed", "blocked", "no_content"])
-            ).subquery()
+            )
             q = session.query(models.SocialLink).filter(
                 models.SocialLink.id.not_in(pivoted_ids)
             )
