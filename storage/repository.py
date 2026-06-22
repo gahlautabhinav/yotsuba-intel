@@ -507,3 +507,38 @@ class Repository:
     def get_archive_posts_by_md5(self, file_md5: str) -> list[models.ArchivePost]:
         with get_session() as session:
             return session.query(models.ArchivePost).filter_by(file_md5=file_md5).all()
+
+    # ------------------------------------------------------------------
+    # Phase 7 — Analysis layer methods
+    # ------------------------------------------------------------------
+
+    def get_posts_by_trip(self, trip: str) -> list[models.Post]:
+        with get_session() as session:
+            return session.query(models.Post).filter_by(trip=trip).all()
+
+    def get_posts_by_md5(self, file_md5: str) -> list[models.Post]:
+        with get_session() as session:
+            return session.query(models.Post).filter_by(file_md5=file_md5).all()
+
+    def get_links_by_post_ids(self, post_ids: list[int]) -> list[models.SocialLink]:
+        with get_session() as session:
+            return session.query(models.SocialLink).filter(
+                models.SocialLink.post_id.in_(post_ids)
+            ).all()
+
+    def get_pgp_keys_by_post_ids(self, post_ids: list[int]) -> list[models.PgpKey]:
+        with get_session() as session:
+            return session.query(models.PgpKey).filter(
+                models.PgpKey.post_id.in_(post_ids)
+            ).all()
+
+    def update_tripcode_timezone(self, trip: str, tz_result: dict) -> None:
+        import json as _json
+        with get_session() as session:
+            obj = session.query(models.Tripcode).filter_by(trip=trip).first()
+            if obj:
+                obj.timezone_guess = tz_result["timezone_guess"]
+                obj.timezone_confidence = tz_result["confidence"]
+                obj.timezone_histogram = _json.dumps(tz_result["histogram"])
+                obj.timezone_warning = tz_result.get("warning")
+                session.commit()
