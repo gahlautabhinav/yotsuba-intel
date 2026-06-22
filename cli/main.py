@@ -14,7 +14,9 @@ def cli():
 from cli.commands.scrape import scrape
 from cli.commands.show import show
 from cli.commands.export import export
+from cli.commands.pivot import pivot
 
 cli.add_command(scrape)
 cli.add_command(show)
 cli.add_command(export)
+cli.add_command(pivot)
