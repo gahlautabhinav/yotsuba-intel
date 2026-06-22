@@ -72,7 +72,7 @@ def run_pivots(
     # Sort by priority
     links.sort(key=lambda lk: PLATFORM_PRIORITY.get(lk.platform, 99))
 
-    counts: dict[str, int] = {"processed": 0, "success": 0, "failed": 0, "skipped": 0}
+    counts: dict[str, int] = {"processed": 0, "success": 0, "no_content": 0, "failed": 0, "skipped": 0}
 
     for lk in links:
         handle = lk.handle or lk.raw_url
@@ -85,12 +85,14 @@ def run_pivots(
             counts["skipped"] += 1
             continue
 
+        error_msg: Optional[str] = None
         try:
             fetcher = pivot_cls()
             status, data = fetcher.fetch(handle)
         except Exception as e:
             status = "failed"
             data = None
+            error_msg = str(e)
 
         profile_data: Optional[str] = None
         if data is not None:
@@ -101,11 +103,14 @@ def run_pivots(
             status=status,
             profile_data=profile_data,
             raw_html_snippet=None,
+            error=error_msg if status == "failed" else None,
         )
 
         counts["processed"] += 1
         if status == "success":
             counts["success"] += 1
+        elif status in ("no_content", "blocked"):
+            counts["no_content"] += 1
         else:
             counts["failed"] += 1
 

@@ -35,14 +35,16 @@ class EmailPivot(BasePivot):
             )
             if g_resp.status_code == 200:
                 g_body = g_resp.json()
-                entry = g_body.get("entry", [{}])[0]
-                real_name = entry.get("displayName")
-                for acc in entry.get("accounts", []):
-                    shortname = acc.get("shortname")
-                    url = acc.get("url")
-                    if shortname and url:
-                        linked_accounts[shortname] = url
-                got_data = True
+                entries = g_body.get("entry", [])
+                if entries:
+                    entry = entries[0]
+                    real_name = entry.get("displayName")
+                    for acc in entry.get("accounts", []):
+                        shortname = acc.get("shortname")
+                        url = acc.get("url")
+                        if shortname and url:
+                            linked_accounts[shortname] = url
+                    got_data = True
         except Exception:
             pass
 

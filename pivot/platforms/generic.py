@@ -60,7 +60,7 @@ class GenericPivot(BasePivot):
             extra={
                 "title": title,
                 "og_title": og_title,
-                "og_description": og_description,
+                "og:description": og_description,
                 "emails_found": emails_found,
             }
         )
