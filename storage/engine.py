@@ -36,6 +36,7 @@ def get_session() -> Session:
             autocommit=False,
             autoflush=False,
             bind=get_engine(),
+            expire_on_commit=False,
         )
     return _SessionLocal()
 

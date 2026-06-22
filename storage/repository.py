@@ -135,13 +135,11 @@ class Repository:
 
     def get_pending_links(self, platform: Optional[str] = None) -> list[models.SocialLink]:
         with get_session() as session:
-            q = (
-                session.query(models.SocialLink)
-                .outerjoin(models.PivotResult, models.SocialLink.id == models.PivotResult.link_id)
-                .filter(
-                    (models.PivotResult.id == None)  # noqa: E711
-                    | (models.PivotResult.status == "pending")
-                )
+            pivoted_ids = session.query(models.PivotResult.link_id).filter(
+                models.PivotResult.status.in_(["success", "failed", "blocked", "no_content"])
+            ).subquery()
+            q = session.query(models.SocialLink).filter(
+                models.SocialLink.id.not_in(pivoted_ids)
             )
             if platform:
                 q = q.filter(models.SocialLink.platform == platform)
@@ -298,8 +296,10 @@ class Repository:
             if obj is None:
                 obj = models.Tripcode(trip=trip, trip_strength=trip_strength)
                 session.add(obj)
-                session.commit()
-                session.refresh(obj)
+            else:
+                obj.trip_strength = trip_strength
+            session.commit()
+            session.refresh(obj)
             return obj
 
     def update_tripcode_stats(
