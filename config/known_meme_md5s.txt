@@ -1,0 +1,3 @@
+# Known high-frequency 4chan meme image MD5s (base64-encoded)
+# Lines starting with # are comments. One MD5 per line.
+# Auto-populated by chan correlate when n > 50 posts found for same MD5.
