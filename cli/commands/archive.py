@@ -79,12 +79,12 @@ def archive(
 
     # Save to DB
     if save and results:
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         saved = 0
         for post in results:
             try:
-                fetched_at = datetime.now(timezone.utc).replace(tzinfo=None)
+                fetched_at = datetime.utcnow()
                 repo.save_archive_post(
                     source=post["source"],
                     board=post["board"],
