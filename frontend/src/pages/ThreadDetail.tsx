@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, Navigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../api/client'
 import Skeleton from '../components/Skeleton'
@@ -11,6 +11,7 @@ type Tab = 'posts' | 'links' | 'emails'
 export default function ThreadDetail() {
   const { id } = useParams<{ id: string }>()
   const tid = Number(id)
+  if (isNaN(tid)) return <Navigate to="/threads" replace />
   const [tab, setTab] = useState<Tab>('posts')
 
   const thread = useQuery({ queryKey: ['thread', tid], queryFn: () => api.getThread(tid) })
