@@ -1,4 +1,4 @@
-const BASE = 'http://localhost:8000'
+const BASE = 'http://localhost:8003'
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`)
