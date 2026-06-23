@@ -28,7 +28,8 @@ export const api = {
   getTripProfile: (trip: string) => get<TripProfile>(`/tripcodes/${encodeURIComponent(trip)}/profile`),
   correlateMd5: (md5: string) => post<Md5Result>('/correlate/md5', { md5 }),
   archiveSearch: (req: ArchiveSearchReq) => post<ArchivePost[]>('/archive/search', req),
-  scrape: (url: string, download_images = false) => post<{ status: string }>('/scrape/', { url, download_images }),
+  scrape: (url: string, download_images = false) => post<{ status: string; job_id: string }>('/scrape/', { url, download_images }),
+  scrapeStreamUrl: (job_id: string) => `http://localhost:8003/scrape/stream/${job_id}`,
   listLinks: () => get<Link[]>('/links/'),
   listEmails: () => get<EmailItem[]>('/emails/'),
 }
