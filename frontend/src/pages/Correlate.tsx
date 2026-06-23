@@ -1,11 +1,13 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { api } from '../api/client'
 import Badge from '../components/Badge'
 import EmptyState from '../components/EmptyState'
 
 export default function Correlate() {
-  const [md5, setMd5] = useState('')
+  const location = useLocation()
+  const [md5, setMd5] = useState<string>(location.state?.md5 ?? '')
   const correlate = useMutation({ mutationFn: (m: string) => api.correlateMd5(m) })
 
   return (

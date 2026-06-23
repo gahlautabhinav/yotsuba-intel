@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api } from '../api/client'
 import StatCard from '../components/StatCard'
 import Skeleton from '../components/Skeleton'
@@ -63,9 +64,9 @@ export default function Dashboard() {
             {recent.length === 0 ? (
               <p className="text-sm text-mute px-4 py-3">No threads scraped yet.</p>
             ) : recent.map(t => (
-              <a
+              <Link
                 key={t.id}
-                href={`/threads/${t.id}`}
+                to={`/threads/${t.id}`}
                 className="flex items-center justify-between px-4 py-2.5 border-b border-hairline last:border-b-0 hover:bg-canvas-soft transition-colors"
               >
                 <div>
@@ -73,7 +74,7 @@ export default function Dashboard() {
                   <p className="text-sm text-ink mt-0.5 truncate max-w-sm">{t.subject ?? '(no subject)'}</p>
                 </div>
                 <span className="text-xs text-mute font-mono">{t.post_count}p</span>
-              </a>
+              </Link>
             ))}
           </div>
         )}
